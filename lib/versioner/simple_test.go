@@ -71,7 +71,7 @@ func TestSimpleVersioningVersionCount(t *testing.T) {
 			t.Error(err)
 		}
 		f.Close()
-		if err := v.Archive(path); err != nil {
+		if err := v.Archive(path, "test"); err != nil {
 			t.Error(err)
 		}
 

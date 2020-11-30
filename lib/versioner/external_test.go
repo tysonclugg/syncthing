@@ -33,7 +33,7 @@ func TestExternalNoCommand(t *testing.T) {
 		filesystem: fs.NewFilesystem(fs.FilesystemTypeBasic, "."),
 		command:    "nonexistent command",
 	}
-	if err := e.Archive(file); err == nil {
+	if err := e.Archive(file, "test"); err == nil {
 		t.Error("Command should have failed")
 	}
 
@@ -66,7 +66,7 @@ func TestExternal(t *testing.T) {
 		filesystem: fs.NewFilesystem(fs.FilesystemTypeBasic, "."),
 		command:    cmd,
 	}
-	if err := e.Archive(file); err != nil {
+	if err := e.Archive(file, "test"); err != nil {
 		t.Fatal(err)
 	}
 

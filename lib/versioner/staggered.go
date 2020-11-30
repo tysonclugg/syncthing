@@ -211,7 +211,7 @@ func (v *staggered) toRemove(versions []string, now time.Time) []string {
 
 // Archive moves the named file away to a version archive. If this function
 // returns nil, the named file does not exist any more (has been archived).
-func (v *staggered) Archive(filePath string) error {
+func (v *staggered) Archive(filePath string, reason string) error {
 	l.Debugln("Waiting for lock on ", v.versionsFs)
 	v.mutex.Lock()
 	defer v.mutex.Unlock()
@@ -223,6 +223,18 @@ func (v *staggered) Archive(filePath string) error {
 	v.expire(findAllVersions(v.versionsFs, filePath))
 
 	return nil
+}
+
+func (v *staggered) ArchiveBeforeDelete(filePath string) error {
+	return Archive(filePath, "delete")
+}
+
+func (v *staggered) ArchiveBeforeRename(filePath string) error {
+	return Archive(filePath, "rename")
+}
+
+func (v *staggered) ArchiveBeforeReplace(filePath string) error {
+	return Archive(filePath, "replace")
 }
 
 func (v *staggered) GetVersions() (map[string][]FileVersion, error) {

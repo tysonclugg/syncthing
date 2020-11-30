@@ -47,10 +47,22 @@ func newTrashcan(folderFs fs.Filesystem, params map[string]string) Versioner {
 
 // Archive moves the named file away to a version archive. If this function
 // returns nil, the named file does not exist any more (has been archived).
-func (t *trashcan) Archive(filePath string) error {
+func (t *trashcan) Archive(filePath string, reason string) error {
 	return archiveFile(t.folderFs, t.versionsFs, filePath, func(name, tag string) string {
 		return name
 	})
+}
+
+func (t *trashcan) ArchiveBeforeDelete(filePath string) error {
+	return Archive(filePath, "delete")
+}
+
+func (t *trashcan) ArchiveBeforeRename(filePath string) error {
+	return Archive(filePath, "rename")
+}
+
+func (t *trashcan) ArchiveBeforeReplace(filePath string) error {
+	return Archive(filePath, "replace")
 }
 
 func (t *trashcan) serve(ctx context.Context) {

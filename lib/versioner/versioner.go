@@ -18,7 +18,10 @@ import (
 )
 
 type Versioner interface {
-	Archive(filePath string) error
+	Archive(filePath string, reason string) error
+	ArchiveBeforeDelete(filePath string) error
+	ArchiveBeforeRename(filePath string) error
+	ArchiveBeforeReplace(filePath string) error
 	GetVersions() (map[string][]FileVersion, error)
 	Restore(filePath string, versionTime time.Time) error
 }

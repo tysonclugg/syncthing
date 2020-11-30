@@ -858,7 +858,7 @@ func (f *sendReceiveFolder) deleteFileWithCurrent(file, cur protocol.FileInfo, h
 	}
 
 	if f.versioner != nil && !cur.IsSymlink() {
-		err = f.inWritableDir(f.versioner.Archive, file.Name)
+		err = f.inWritableDir(f.versioner.ArchiveBeforeDelete, file.Name)
 	} else {
 		err = f.inWritableDir(f.fs.Remove, file.Name)
 	}
@@ -960,7 +960,7 @@ func (f *sendReceiveFolder) renameFile(cur, source, target protocol.FileInfo, sn
 		if err == nil {
 			err = osutil.Copy(f.fs, f.fs, source.Name, tempName)
 			if err == nil {
-				err = f.inWritableDir(f.versioner.Archive, source.Name)
+				err = f.inWritableDir(f.versioner.ArchiveBeforeRename, source.Name)
 			}
 		}
 	} else {
@@ -1815,7 +1815,7 @@ func (f *sendReceiveFolder) deleteItemOnDisk(item protocol.FileInfo, snap *db.Sn
 		// an error.
 		// Symlinks aren't archived.
 
-		return f.inWritableDir(f.versioner.Archive, item.Name)
+		return f.inWritableDir(f.versioner.ArchiveBeforeReplace, item.Name)
 	}
 
 	return f.inWritableDir(f.fs.Remove, item.Name)

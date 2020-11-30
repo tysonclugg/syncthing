@@ -42,7 +42,7 @@ func newSimple(folderFs fs.Filesystem, params map[string]string) Versioner {
 
 // Archive moves the named file away to a version archive. If this function
 // returns nil, the named file does not exist any more (has been archived).
-func (v simple) Archive(filePath string) error {
+func (v simple) Archive(filePath string, reason string) error {
 	err := archiveFile(v.folderFs, v.versionsFs, filePath, TagFilename)
 	if err != nil {
 		return err
@@ -52,15 +52,27 @@ func (v simple) Archive(filePath string) error {
 	versions := findAllVersions(v.versionsFs, filePath)
 	if len(versions) > v.keep {
 		for _, toRemove := range versions[:len(versions)-v.keep] {
-			l.Debugln("cleaning out", toRemove)
+			l.Debugln("cleaning out", toRemove, "for", reason)
 			err = v.versionsFs.Remove(toRemove)
 			if err != nil {
-				l.Warnln("removing old version:", err)
+				l.Warnln("removing old version for", reason, ":", err)
 			}
 		}
 	}
 
 	return nil
+}
+
+func (v simple) ArchiveBeforeDelete(filePath string) error {
+	return Archive(filePath, "delete")
+}
+
+func (v simple) ArchiveBeforeRename(filePath string) error {
+	return Archive(filePath, "rename")
+}
+
+func (v simple) ArchiveBeforeReplace(filePath string) error {
+	return Archive(filePath, "replace")
 }
 
 func (v simple) GetVersions() (map[string][]FileVersion, error) {

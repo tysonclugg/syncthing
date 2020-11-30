@@ -100,7 +100,7 @@ func TestTrashcanArchiveRestoreSwitcharoo(t *testing.T) {
 		"fsPath": tmpDir2,
 	})
 
-	if err := versioner.Archive("file"); err != nil {
+	if err := versioner.Archive("file", "test"); err != nil {
 		t.Fatal(err)
 	}
 

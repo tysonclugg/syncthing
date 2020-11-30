@@ -47,7 +47,7 @@ func newExternal(filesystem fs.Filesystem, params map[string]string) Versioner {
 
 // Archive moves the named file away to a version archive. If this function
 // returns nil, the named file does not exist any more (has been archived).
-func (v external) Archive(filePath string) error {
+func (v external) Archive(filePath string, reason string) error {
 	info, err := v.filesystem.Lstat(filePath)
 	if fs.IsNotExist(err) {
 		l.Debugln("not archiving nonexistent file", filePath)
@@ -59,7 +59,7 @@ func (v external) Archive(filePath string) error {
 		panic("bug: attempting to version a symlink")
 	}
 
-	l.Debugln("archiving", filePath)
+	l.Debugln("archiving", filePath, "for", reason)
 
 	if v.command == "" {
 		return errors.New("Versioner: command is empty, please enter a valid command")
@@ -74,6 +74,7 @@ func (v external) Archive(filePath string) error {
 		"%FOLDER_FILESYSTEM%": v.filesystem.Type().String(),
 		"%FOLDER_PATH%":       v.filesystem.URI(),
 		"%FILE_PATH%":         filePath,
+		"%REASON%":            reason,
 	}
 
 	for i, word := range words {
@@ -105,6 +106,18 @@ func (v external) Archive(filePath string) error {
 		return nil
 	}
 	return errors.New("Versioner: file was not removed by external script")
+}
+
+func (v external) ArchiveBeforeDelete(filePath string) error {
+	return Archive(filePath, "delete");
+}
+
+func (v external) ArchiveBeforeRename(filePath string) error {
+	return Archive(filePath, "rename");
+}
+
+func (v external) ArchiveBeforeReplace(filePath string) error {
+	return Archive(filePath, "replace");
 }
 
 func (v external) GetVersions() (map[string][]FileVersion, error) {
